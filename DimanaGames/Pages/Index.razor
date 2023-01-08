@@ -1,0 +1,96 @@
+﻿@page "/"
+
+<style>
+    .container {
+        width: 400px;
+    }
+
+    button {
+        width: 100px;
+        height: 100px;
+        font-size: 50px;
+    }
+</style>
+
+<PageTitle>Dimana Games</PageTitle>
+
+<h2>Score : @score</h2>
+
+<div class="container">
+    <div class="row">
+        @for(var animalNumber = 0; animalNumber < shuffleAnimals.Count; animalNumber++)  
+        //berfungsi untuk perulangan yang memberikan tanda unik di salah satu animal yang samaa
+        {
+            string animal = shuffleAnimals[animalNumber]; // berfungsi unutk memasukan animal ke dalam shuffleanimals
+            string animalDescription = $"Animal #{animalNumber}"; 
+            <div class="col-3">
+                <button type="button" class="btn btn-outline-dark" @onclick="(()=> ButtonClick(animal, animalDescription))">
+                    <h1>@animal</h1>
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    List<string> animals = new List<string>() // list string ini berfungsi untuk membuat list yang berisikan gambar animals yang kita buat
+    {
+        "🐰","🐰",
+        "🦄","🦄",
+        "🦊","🦊",
+        "🐨","🐨",
+        "🐮","🐮",
+        "🐭","🐭",
+        "🐶","🐶",
+        "🦁","🦁"
+    };
+
+    List<string> shuffleAnimals = new List<string>(); // list ini berfungsi untuk memindahkan list lama ke list baru
+
+    private void SetUpGame()
+    {
+        Random random = new Random(); // berfungsi untuk membuat object baru dan fungsi random
+
+        shuffleAnimals = animals.OrderBy(item => random.Next()).ToList(); // random.next berfungsi untuk membuat tataletak gambar menjadi random
+    }
+
+    protected override void OnInitialized()
+    {
+        SetUpGame(); // berfungsi untuk memanggil setupgame
+    }
+
+    string ClickedAnimal = string.Empty; // berfungsi untuk membuat clickanimal menjadi kosong
+    string clickAnimalDescription = string.Empty;
+
+    int score = 0;
+
+    private void ButtonClick(string animal, string animalDescription)
+    {
+        if (ClickedAnimal == string.Empty) // kondisi ini berfungsi untuk mencek apakah clickedanimal ini kosong atau tidak
+        {
+            ClickedAnimal = animal;
+            clickAnimalDescription = animalDescription; //berungsi untuk mengisi variable clckanimaldescription yang berasal dari variable animaldescription
+        }
+        else if (ClickedAnimal == animal && clickAnimalDescription != animalDescription)
+        // kondisi ini berfungsi untuk cek apakah animal yang pertama di klik sama dengan animal kedua dan animal kedua tidak boleh,
+        //mengklik sama dengan animal yang pertama.
+        {
+            shuffleAnimals = shuffleAnimals.Select(item => item.Replace(animal, string.Empty)).ToList();
+            ClickedAnimal = string.Empty;
+
+            score++;
+
+            if(score == 8)
+            {
+                SetUpGame();
+                score = 0;
+            } // if ini berfungsi untuk mengulang atau merefresh jika score sudah == 8;
+
+
+            else
+            {
+                ClickedAnimal = string.Empty;   
+            }
+        }
+    }
+}
